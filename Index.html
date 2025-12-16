@@ -1,66 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Mobile-Friendly Sport News Fetcher</title>
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Sport News Generator</title>
     
     <style>
-        /* --- 1. Basic Reset and Mobile-First Styles --- */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+        /* Base styles for all screens (Mobile-First) */
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 15px; /* Less padding on small screens */
+            max-width: 600px; /* Constrain width on large desktops */
+            margin: 0 auto; /* Center content on large screens */
+            background-color: #f4f4f9; /* Light background for better look */
         }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
+        
         h2 {
-            color: #007bff;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-top: 0;
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
         }
 
-        /* --- 2. Input and Checkbox Styles (Responsive) --- */
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .input-group input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box; /* Ensures padding doesn't affect total width */
-        }
-
-        .controls {
-            display: flex;
-            flex-direction: column; /* Stack checkboxes vertically on mobile */
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .controls label {
-            display: flex;
-            align-items: center;
+        .controls { 
+            margin-bottom: 30px; 
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             font-weight: normal;
         }
         
