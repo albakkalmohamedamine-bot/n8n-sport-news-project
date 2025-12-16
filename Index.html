@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sport News Generator</title>
+    
+    <style>
+        /* --- 1. Basic Reset and Mobile-First Styles --- */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        /* --- 2. Input and Checkbox Styles (Responsive) --- */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensures padding doesn't affect total width */
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column; /* Stack checkboxes vertically on mobile */
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .controls label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        /* Style for the actual checkbox input */
+        .controls input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* --- 3. Button and Status Styles --- */
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #ffeeba;
+            color: #856404;
+            display: none; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>AI News Generator</h2>
+        <p>Select your sports and enter your contact (Email or Telegram Username) to receive a custom summary from n8n.</p>
+
+        <div class="input-group">
+            <label for="contact">Your Email or Telegram Contact:</label>
+            <input type="text" id="contact" placeholder="e.g., your.email@gmail.com or @telegram_username" required>
+        </div>
+
+        <h3>Choose Sports:</h3>
+        <div class="controls">
+            <label><input type="checkbox" name="sport" value="Soccer">Soccer</label>
+            <label><input type="checkbox" name="sport" value="Basketball">Basketball</label>
+            <label><input type="checkbox" name="sport" value="Formula 1">Formula 1</label>
+            <label><input type="checkbox" name="sport" value="Tennis">Tennis</label>
+        </div>
+
+        <button onclick="triggerWorkflow()">Generate & Send News</button>
+
+        <p id="status"></p>
+    </div>
+
+    <script>
+        // *** IMPORTANT: REPLACE THIS URL WITH YOUR ACTUAL N8N WEBHOOK TEST URL ***
+        const webhookUrl = "YOUR_N8N_WEBHOOK_URL_HERE";
+
+        function showStatus(message, isError = false) {
+            const statusElement = document.getElementById('status');
+            statusElement.innerText = message;
+            statusElement.style.display = 'block';
+            statusElement.style.backgroundColor = isError ? '#f8d7da' : '#d4edda'; // Red for error, Green for success
+            statusElement.style.color = isError ? '#721c24' : '#155724';
+        }
+
+        function triggerWorkflow() {
+            const contactInput = document.getElementById('contact').value.trim();
+            const checkboxes = document.querySelectorAll('input[name="sport"]:checked');
+            const selectedSports = Array.from(checkboxes).map(cb => cb.value);
+
+            if (!contactInput) {
+                showStatus("Please enter your Email or Telegram contact!", true);
+                return;
+            }
+
+            if (selectedSports.length === 0) {
+                showStatus("Please select at least one sport!", true);
+                return;
+            }
+
+            showStatus("Sending request to n8n... Please wait for the AI to process the news.");
+            
+            // Prepare the data to send to n8n
+            const payload = {
+                contact: contactInput,
+                sports: selectedSports.join(", ") 
+            };
+
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                if (response.ok) {
+                    showStatus("Workflow triggered successfully! Check your contact in a minute for the AI summary.");
+                } else {
+                    showStatus(`Error: Failed to trigger n8n workflow. Status: ${response.status}.`, true);
+                }
+            })
+            .catch(error => {
+                showStatus(`Network Error: ${error.message}. Check your n8n URL.`, true);
+                console.error('Fetch error:', error);
+            });
+        }
+    </script>
+
+</body>
+</html>
