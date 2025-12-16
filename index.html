@@ -48,12 +48,12 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box; /* Ensures padding doesn't affect total width */
+            box-sizing: border-box;
         }
 
         .controls {
             display: flex;
-            flex-direction: column; /* Stack checkboxes vertically on mobile */
+            flex-direction: column;
             gap: 10px;
             margin-bottom: 20px;
         }
@@ -64,7 +64,6 @@
             font-weight: normal;
         }
         
-        /* Style for the actual checkbox input */
         .controls input[type="checkbox"] {
             margin-right: 10px;
             width: 18px;
@@ -92,9 +91,8 @@
             margin-top: 20px;
             padding: 10px;
             border-radius: 4px;
-            background-color: #ffeeba;
-            color: #856404;
-            display: none; /* Hidden by default */
+            /* Colors will be set by JavaScript based on success/error */
+            display: none; 
         }
     </style>
 </head>
@@ -102,11 +100,11 @@
 
     <div class="container">
         <h2>AI News Generator</h2>
-        <p>Select your sports and enter your contact (Email or Telegram Username) to receive a custom summary from n8n.</p>
+        <p>Select your sports and enter your contact (Email or Telegram Username) to receive a custom summary.</p>
 
         <div class="input-group">
-            <label for="contact">Your Email or Telegram Contact:</label>
-            <input type="text" id="contact" placeholder="e.g., your.email@gmail.com or @telegram_username" required>
+            <label for="contact">Your Contact (Email or Telegram @username):</label>
+            <input type="text" id="contact" placeholder="e.g., your.email@gmail.com or @telegram_user" required>
         </div>
 
         <h3>Choose Sports:</h3>
@@ -124,23 +122,26 @@
 
     <script>
         // *** IMPORTANT: REPLACE THIS URL WITH YOUR ACTUAL N8N WEBHOOK TEST URL ***
-        const webhookUrl = "https://amine22.app.n8n.cloud/webhook-test/sport-news-request";
+        const webhookUrl = "YOUR_N8N_WEBHOOK_URL_HERE";
 
         function showStatus(message, isError = false) {
             const statusElement = document.getElementById('status');
             statusElement.innerText = message;
             statusElement.style.display = 'block';
-            statusElement.style.backgroundColor = isError ? '#f8d7da' : '#d4edda'; // Red for error, Green for success
+            // Set colors dynamically based on if it's an error or success
+            statusElement.style.backgroundColor = isError ? '#f8d7da' : '#d4edda'; 
             statusElement.style.color = isError ? '#721c24' : '#155724';
         }
 
         function triggerWorkflow() {
+            // Get the data from the form fields
             const contactInput = document.getElementById('contact').value.trim();
             const checkboxes = document.querySelectorAll('input[name="sport"]:checked');
             const selectedSports = Array.from(checkboxes).map(cb => cb.value);
 
+            // Simple validation
             if (!contactInput) {
-                showStatus("Please enter your Email or Telegram contact!", true);
+                showStatus("Please enter your contact information!", true);
                 return;
             }
 
@@ -149,14 +150,16 @@
                 return;
             }
 
+            // Update status while sending
             showStatus("Sending request to n8n... Please wait for the AI to process the news.");
             
-            // Prepare the data to send to n8n
+            // Prepare the payload (data) to send to n8n
             const payload = {
                 contact: contactInput,
                 sports: selectedSports.join(", ") 
             };
 
+            // Send the POST request to the n8n webhook
             fetch(webhookUrl, {
                 method: 'POST',
                 headers: {
@@ -168,11 +171,11 @@
                 if (response.ok) {
                     showStatus("Workflow triggered successfully! Check your contact in a minute for the AI summary.");
                 } else {
-                    showStatus(`Error: Failed to trigger n8n workflow. Status: ${response.status}.`, true);
+                    showStatus(`Error: Failed to trigger n8n workflow. Status: ${response.status}. Check your Webhook URL or n8n status.`, true);
                 }
             })
             .catch(error => {
-                showStatus(`Network Error: ${error.message}. Check your n8n URL.`, true);
+                showStatus(`Network Error: Could not connect to the Webhook URL.`, true);
                 console.error('Fetch error:', error);
             });
         }
